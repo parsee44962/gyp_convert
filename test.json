@@ -1,0 +1,14 @@
+{ 
+    "source": "cluster.smi", 
+    "separate_output_files": true, 
+    "job_manager": "multiprocessing", 
+    "output_folder": "./output/", 
+    "add_pdb_output": true, 
+    "max_variants_per_compound": 4, 
+    "thoroughness": 2, 
+    "num_processors": 8, 
+    "min_ph": 6.4, 
+    "max_ph": 8.4, 
+    "pka_precision": 1, 
+    "skip_optimize_geometry":false 
+}

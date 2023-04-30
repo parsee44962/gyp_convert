@@ -1,0 +1,1 @@
+{"source": "NPA\\SN0000005.sdf", "separate_output_files": true, "job_manager": "multiprocessing", "output_folder": "output_NPA", "max_variants_per_compound": 3, "thoroughness": 1, "num_processors": -1, "min_ph": 6.4, "max_ph": 8.4, "pka_precision": 1, "skip_optimize_geometry": false, "add_pdb_output": false}
