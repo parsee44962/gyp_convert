@@ -8,6 +8,11 @@
 ```bash
 conda env create -f environment.yml
 ```
+上述环境在windows下导出，linux推荐通过以下命令安装
+```bash
+conda create -c conda-forge --name gyp rdkit numpy scipy mpi4py -y
+conda install tqdm
+```
 
 2.激活环境并测试
 ```bash
