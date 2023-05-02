@@ -42,9 +42,20 @@ def run_pdbqt(path, output_path):
     ) as f:
         subprocess.run(cmd, stdout=f)
 
+def calculate_energy(mol):
+    # 添加隐式氢原子
+    mol = Chem.AddHs(mol)
+    # 计算MMFF能量
+    ff = AllChem.MMFFGetMoleculeForceField(mol, AllChem.MMFFGetMoleculeProperties(mol))
+    energy = ff.CalcEnergy()
+    return energy
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", type=str, help="data path")
+parser.add_argument("--skipgyp", type=bool, help="skipgyp")
+parser.add_argument("--skipenergy", type=bool, help="skipenergy")
+parser.add_argument("--skippdbqt", type=bool, help="skippdbqt")
 args = parser.parse_args()
 path = str(args.data)
 
@@ -61,6 +72,7 @@ except:
     pass
 
 dataset = glob.glob(os.path.join(path, "*.sdf"))
+
 
 ##Gyp 2d -> 3d
 for i in tqdm(dataset):
@@ -117,9 +129,8 @@ try:
     os.mkdir("output_top1")
 except:
     pass
-
 for filename in tqdm(new_sdf):
-    if filename == "gypsum_dl_params.sdf":
+    if filename == "gypsum_dl_params.sdf" or '_top1' in filename:
         continue
     try:
         suppl = Chem.SDMolSupplier(filename)
@@ -127,25 +138,27 @@ for filename in tqdm(new_sdf):
         with open("run.log", "a") as f:
             f.write(filename + "\t" + "can not read this mol" + "\n")
         continue
-
-    ##caculate
+    mols = [x for x in suppl if x is not None]
     energies = {}
-    for i, mol in enumerate(suppl):
-        if mol is not None:
-            try:
-                mol = Chem.AddHs(mol)
-                pro = Chem.rdForceFieldHelpers.MMFFGetMoleculeProperties(mol)
-                ff = AllChem.MMFFGetMoleculeForceField(mol, pro)
-                energies[i] = ff.CalcEnergy()
-            except:
-                with open("run.log", "a") as f:
-                    f.write(filename + "\t" + "can not caculate energy" + "\n")
-                continue
+    for mol in mols:
+        try:
+            energies[mol] = calculate_energy(mol)
+        except:
+            with open("run.log", "a") as f:
+                f.write(filename + "\t" + "can not caculate energy" + "\n")
+            continue
+    try:
+        min_energy = min(energies.values())
+        min_mol = [k for k, v in energies.items() if v == min_energy][0]
 
-    sorted_energies = sorted(energies.items(), key=lambda x: x[1])
-    mol = suppl[sorted_energies[0][0]]
-    Chem.MolToMolFile(mol, filename.split(".")[0].split("__")[0] + "_top1.sdf")
-
+        w = Chem.SDWriter(os.path.basename(filename).split('.')[0] + '_top1.sdf')
+        w.write(min_mol)
+        w.close()
+    except:
+        with open("run.log", "a") as f:
+            f.write(filename + "\t" + "can not caculate energy" + "\n")
+        continue
+    
 for i in glob.glob("*_top1.sdf"):
     shutil.move(i, os.path.join("output_top1", os.path.basename(i)))
 
