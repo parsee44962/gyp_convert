@@ -10,8 +10,8 @@ except:
     pass
 
 for i in output_dir:
-    for j in glob.glob(os.path.join(i,"output_top1","output_pdbqt","*__input_top1.pdbqt")):
-        os.rename(j,os.path.join(i,"output_top","output_pdbqt",os.path.basename(j).split("__")[0]+"_gyp.pdbqt"))
-    for j in glob.glob(os.path.join(i,"output_top1","output_pdbqt","*_gyp.pdbqt")):
-        shutil.move(j,os.path.join("output",os.path.basename(j)))
+    for j in glob.glob(os.path.join(i,"output_top1","output_pdbqt","*__input1_top1.pdbqt")):
+        os.rename(j,os.path.join(i,"output_top1","output_pdbqt",os.path.basename(j).split("__")[0]+"_gyp.pdbqt"))
+    for k in glob.glob(os.path.join(i,"output_top1","output_pdbqt","*_gyp.pdbqt")):
+        shutil.move(k,os.path.join("output",os.path.basename(k)))
         
