@@ -71,8 +71,8 @@ try:
 except:
     pass
 
-dataset = glob.glob(os.path.join(path, "*.sdf"))
-
+dataset = glob.glob(os.path.join(path, "*.smi"))
+dataset += glob.glob(os.path.join(path, "*.sdf"))
 
 ##Gyp 2d -> 3d
 for i in tqdm(dataset):
